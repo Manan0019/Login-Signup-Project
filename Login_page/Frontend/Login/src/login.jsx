@@ -1,85 +1,23 @@
-/*import React, { useState } from "react";
-import UsersTable from "./UsersTable";
-import "./login.css";
-
-function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      const response = await fetch("http://localhost:5000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-      alert(data.message);
-
-      setIsLoggedIn(true);
-
-    } catch (error) {
-      alert("Something went wrong");
-    }
-  };
-
-  if (isLoggedIn) {
-    return <UsersTable />;
-  }
-
-  return (
-    <div className="mainbg">
-      <div className="middle">
-        <div className="welcome">Welcome Back!</div>
-
-        <form onSubmit={handleSubmit}>
-          <div className="emaildiv">
-            <label className="lab">Email address</label>
-            <input
-              className="form-control"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="passworddiv">
-            <label className="lab">Password</label>
-            <input
-              type="password"
-              className="form-control"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          <button className="glow-on-hover">Login</button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-export default Login;*/
-
 import React, { useState } from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 import "./login.css";
 
 function Login({ onSuccess, goSignup }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+
+  // Dialog state
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMessage, setDialogMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
 
     const res = await fetch("http://localhost:5000/login-verify", {
       method: "POST",
@@ -90,8 +28,11 @@ function Login({ onSuccess, goSignup }) {
     const data = await res.json();
 
     if (!res.ok) {
-      setError(data.message);
+      // ❌ Show dialog instead of inline error
+      setDialogMessage(data.message);
+      setDialogOpen(true);
     } else {
+      // ✅ Login success
       onSuccess();
     }
   };
@@ -118,8 +59,6 @@ function Login({ onSuccess, goSignup }) {
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          {error && <p className="error">{error}</p>}
-
           <button className="glow-on-hover">Login</button>
 
           <p className="switch">
@@ -129,14 +68,22 @@ function Login({ onSuccess, goSignup }) {
               className="link-btn"
               onClick={goSignup}
             >
-            Register
-          </button>
+              Register
+            </button>
           </p>
         </form>
       </div>
+
+      {/* 🔔 ERROR DIALOG */}
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+        <DialogTitle>Login Error</DialogTitle>
+        <DialogContent>{dialogMessage}</DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)}>OK</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
 
 export default Login;
-

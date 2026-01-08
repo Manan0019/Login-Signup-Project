@@ -1,30 +1,18 @@
-/*import { useState } from 'react'
-import Login from './Login'
-import UsersTable from "./UsersTable";
-
-function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  return (
-    <>
-      {
-      isLoggedIn ? (<UsersTable />) : (<Login onLogin={() => setIsLoggedIn(true)} />)
-      }
-    </>
-  );
-}
-
-export default App;*/
-
 import React, { useState } from "react";
-import Login from "./Login";
-import Signup from "./Signup";
+import Login from "./login";
+import Signup from "./signup";
 import UsersTable from "./UsersTable";
 
 function App() {
   const [page, setPage] = useState("login");
 
-  if (page === "users") return <UsersTable />;
+  const handleLogout = () => {
+    setPage("login"); // 🔁 back to start
+  };
+
+  if (page === "users") {
+    return <UsersTable onLogout={handleLogout} />;
+  }
 
   return page === "login" ? (
     <Login
