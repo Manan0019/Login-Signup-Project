@@ -128,3 +128,35 @@
     50% { background-position: 400% 0; }
     100% { background-position: 0 0; }
 }
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.user-table th,
+.user-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.user-table th {
+  background-color: #6c5b7b;
+  color: white;
+}
+
+.user-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+.error {
+  color: red;
+  margin-top: 10px;
+}
+
+.switch span {
+  color: #6c5b7b;
+  cursor: pointer;
+  font-weight: 600;
+}
