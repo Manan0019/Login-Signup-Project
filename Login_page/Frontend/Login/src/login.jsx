@@ -43,7 +43,7 @@ function Login({ onSuccess, goSignup }) {
         <form onSubmit={handleSubmit}>
           <input
             placeholder="Email"
-            className="form-control"
+            className="form-control emaildiv"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             autoFocus
@@ -52,18 +52,18 @@ function Login({ onSuccess, goSignup }) {
           <input
             type="password"
             placeholder="Password"
-            className="form-control"
+            className="form-control passworddiv"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          <button className="glow-on-hover">Login</button>
+          <button className="glow-on-hover button">Login</button>
 
-          <p className="switch">
+          <p className="switch newhere">
             New here?
             <button
               type="button"
-              className="link-btn"
+              className="link-btn regibtn"
               onClick={goSignup}
             >
               Register

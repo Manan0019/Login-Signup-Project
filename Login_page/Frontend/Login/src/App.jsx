@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Login from "./Login";
 import Signup from "./signup";
 import UsersTable from "./UsersTable";
-import "./styles.css";
+import "./login.css";
 
 function App() {
   const [page, setPage] = useState("login");

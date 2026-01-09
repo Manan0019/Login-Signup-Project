@@ -2,9 +2,9 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'calibri';
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
 }
-
 
 .mainbg{
     background: linear-gradient(135deg,#355C7D, #6C5B7B, #C06C84);
@@ -45,6 +45,21 @@
   color: #000000;
 }
 
+.newhere {
+  margin-top: 16px;
+  text-align: left;
+  font-size: 0.95rem;
+}
+.regibtn {
+  background: none;
+  border: none;
+  color: #442a6a;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: underline;
+  font-size: 0.95rem;
+  margin-left: 8px;
+}
 
 .emaildiv,
 .passworddiv {
@@ -58,14 +73,8 @@
   cursor: pointer;
   border-radius: 5px;
   font-size: 1rem;
-}
+}*/
 
- Hover effect 
-.button:hover {
-  background-color: #157347;
-  border-color: #146c43;
-}
-*/
 .glow-on-hover {
     width: 100%;
     height: 52px;
