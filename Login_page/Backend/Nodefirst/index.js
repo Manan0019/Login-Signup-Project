@@ -1,4 +1,3 @@
-/*hello this is test*/
 const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql2");
@@ -79,6 +78,33 @@ app.get("/users", (req, res) => {
     res.json(result);
   });
 });
+
+app.put("/users/:id", (req, res) => {
+  const { id } = req.params;
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+
+  const sql = "UPDATE users SET email = ? WHERE id = ?";
+
+  db.query(sql, [email, id], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Database update failed" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ message: "User updated successfully" });
+  });
+});
+
+
+
 
 app.listen(5000, () => {
   console.log("Server running on port 5000");

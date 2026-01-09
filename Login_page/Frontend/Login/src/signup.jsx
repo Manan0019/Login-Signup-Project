@@ -28,12 +28,10 @@ function Signup({ goLogin }) {
     const data = await res.json();
 
     if (!res.ok) {
-      // ❌ Error dialog
       setDialogMessage(data.message);
       setIsSuccess(false);
       setDialogOpen(true);
     } else {
-      // ✅ Success dialog
       setDialogMessage("Thank you for registering! Please login to continue.");
       setIsSuccess(true);
       setDialogOpen(true);
@@ -43,7 +41,6 @@ function Signup({ goLogin }) {
   const handleDialogClose = () => {
     setDialogOpen(false);
 
-    // ✅ Redirect ONLY after success
     if (isSuccess) {
       goLogin();
     }

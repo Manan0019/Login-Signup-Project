@@ -11,8 +11,6 @@ import "./login.css";
 function Login({ onSuccess, goSignup }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
 

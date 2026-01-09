@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { DataGrid } from "@mui/x-data-grid";
-import Paper from "@mui/material/Paper";
 import {
   Dialog,
   DialogTitle,
@@ -12,31 +10,58 @@ import "./login.css";
 
 function UsersTable({ onLogout }) {
   const [users, setUsers] = useState([]);
-
-  // Dialog state
   const [open, setOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [email, setEmail] = useState("");
 
-  useEffect(() => {
+  const fetchUsers = () => {
     fetch("http://localhost:5000/users")
       .then((res) => res.json())
-      .then((data) => setUsers(data));
+      .then(setUsers)
+      .catch(console.error);
+  };
+
+  useEffect(() => {
+    fetchUsers();
   }, []);
 
-  const columns = [
-    { field: "id", headerName: "ID", width: 80 },
-    { field: "email", headerName: "Email", width: 300 },
-  ];
+  const handleEditClick = (user) => {
+    setEditingUser(user);
+    setEmail(user.email || "");
+  };
+
+  const handleUpdate = async () => {
+    if (!editingUser) return;
+
+    try {
+      const res = await fetch(
+        `http://localhost:5000/users/${editingUser.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        }
+      );
+
+      if (res.ok) {
+        setEditingUser(null);
+        fetchUsers();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="mainbg">
-      <div className="middle" style={{ width: "650px" }}>
+      <div className="middle users">
         {/* HEADER */}
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: "15px",
+            marginBottom: "20px",
           }}
         >
           <h2 className="welcome" style={{ margin: 0 }}>
@@ -52,22 +77,62 @@ function UsersTable({ onLogout }) {
           </Button>
         </div>
 
+        {/* EDIT CARD */}
+        {editingUser && (
+          <div className="edit-card">
+            <h3>Edit User</h3>
+
+            <input
+              className="edit-input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+
+            <div className="edit-actions">
+              <button className="glow-on-hover" onClick={handleUpdate}>
+                Save Changes
+              </button>
+
+              <button
+                className="cancel-btn"
+                onClick={() => setEditingUser(null)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* TABLE */}
-        <Paper sx={{ height: 400, width: "100%" }}>
-          <DataGrid
-            rows={users}
-            columns={columns}
-            pageSizeOptions={[5, 10]}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 5 },
-              },
-            }}
-          />
-        </Paper>
+        <table className="user-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Email</th>
+              <th>Edit</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {users.map((u) => (
+              <tr key={u.id}>
+                <td>{u.id}</td>
+                <td>{u.email}</td>
+                <td>
+                  <button
+                    className="edit-btn"
+                    onClick={() => handleEditClick(u)}
+                  >
+                    ✏️
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      {/* 🔔 SIGN OUT CONFIRMATION DIALOG */}
+      {/* SIGN OUT DIALOG */}
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Confirm Sign Out</DialogTitle>
         <DialogContent>
@@ -79,7 +144,7 @@ function UsersTable({ onLogout }) {
             color="error"
             onClick={() => {
               setOpen(false);
-              onLogout(); // 🔁 back to login
+              onLogout();
             }}
           >
             Yes
