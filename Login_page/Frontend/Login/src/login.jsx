@@ -28,11 +28,9 @@ function Login({ onSuccess, goSignup }) {
     const data = await res.json();
 
     if (!res.ok) {
-      // ❌ Show dialog instead of inline error
       setDialogMessage(data.message);
       setDialogOpen(true);
     } else {
-      // ✅ Login success
       onSuccess();
     }
   };

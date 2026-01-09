@@ -1,26 +1,36 @@
 import React, { useState } from "react";
-import Login from "./login";
+import Login from "./Login";
 import Signup from "./signup";
 import UsersTable from "./UsersTable";
+import "./styles.css";
 
 function App() {
   const [page, setPage] = useState("login");
 
-  const handleLogout = () => {
-    setPage("login"); // 🔁 back to start
-  };
+  return (
+    <div className="app-bg">
+      <div className="bg-shapes">
+        <div className="shape"></div>
+        <div className="shape"></div>
+        <div className="shape"></div>
+        <div className="shape"></div>
+      </div>
 
-  if (page === "users") {
-    return <UsersTable onLogout={handleLogout} />;
-  }
+      {page === "login" && (
+        <Login
+          onSuccess={() => setPage("users")}
+          goSignup={() => setPage("signup")}
+        />
+      )}
 
-  return page === "login" ? (
-    <Login
-      goSignup={() => setPage("signup")}
-      onSuccess={() => setPage("users")}
-    />
-  ) : (
-    <Signup goLogin={() => setPage("login")} />
+      {page === "signup" && (
+        <Signup goLogin={() => setPage("login")} />
+      )}
+
+      {page === "users" && (
+        <UsersTable onLogout={() => setPage("login")} />
+      )}
+    </div>
   );
 }
 
