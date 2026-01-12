@@ -17,20 +17,20 @@ function Login({ onSuccess, goSignup }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/login-verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+    const res = await fetch("http://localhost:5000/login-verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (!res.ok) {
-        setDialogMessage(data.message);
-        setDialogOpen(true);
-      } else {
-        onSuccess();
-      }
+    if (!res.ok) {
+      setDialogMessage(data.message);
+      setDialogOpen(true);
+    } else {
+      onSuccess();
+    }
     } catch (error) {
       setDialogMessage("Login failed! Please try again.");
       setDialogOpen(true);
@@ -74,6 +74,7 @@ function Login({ onSuccess, goSignup }) {
         </form>
       </div>
 
+     
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Login Error</DialogTitle>
         <DialogContent>{dialogMessage}</DialogContent>
@@ -85,4 +86,5 @@ function Login({ onSuccess, goSignup }) {
   );
 }
 
-export default Login;
+export default Login;     
+
