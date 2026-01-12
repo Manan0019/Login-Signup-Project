@@ -83,7 +83,6 @@ function Login({ onSuccess, goSignup }) {
 
 export default Login;*/
 
-
 import React, { useState } from "react";
 import {
   Dialog,
@@ -94,14 +93,14 @@ import {
 } from "@mui/material";
 import "./login.css";
 
-class Login extends React.Component({ onSuccess, goSignup }) {
-  constructor(props){
+class Login extends React.Component {
+  constructor(props) {
     super(props);
-    this.state={
+    this.state = {
       email: "",
       password: "",
       dialogOpen: false,
-      dialogMessage: ""
+      dialogMessage: "",
     };
   }
 
@@ -109,76 +108,83 @@ class Login extends React.Component({ onSuccess, goSignup }) {
     e.preventDefault();
     const { email, password } = this.state;
 
-    try{
-    const res = await fetch("http://localhost:5000/login-verify", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch("http://localhost:5000/login-verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      this.setState({dialogOpen: true, dialogMessage: data.message});
-    } else {
-      this.props.onSuccess();
-    }
-  }
-    catch(error){
-      this.setState({dialogOpen: true, dialogMessage: "Login failed! Please try again."});
+      if (!res.ok) {
+        this.setState({ dialogOpen: true, dialogMessage: data.message });
+      } else {
+        this.props.onSuccess();
+      }
+    } catch (error) {
+      this.setState({
+        dialogOpen: true,
+        dialogMessage: "Login failed! Please try again.",
+      });
     }
   };
-  render (){
+  render() {
     const { email, password, dialogOpen, dialogMessage } = this.state;
-    const{ onSuccess, goSignup } = this.props;
+    const { onSuccess, goSignup } = this.props;
 
     return (
-    <div className="mainbg">
-      <div className="middle">
-        <h2 className="welcome">Login</h2>
+      <div className="mainbg">
+        <div className="middle">
+          <h2 className="welcome">Login</h2>
 
-        <form onSubmit={handleSubmit}>
-          <input
-            placeholder="Email"
-            className="form-control emaildiv"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoFocus
-          />
+          <form onSubmit={this.handleSubmit}>
+            <input
+              placeholder="Email"
+              className="form-control emaildiv"
+              value={email}
+              onChange={(e) => this.setState({ email: e.target.value })}
+              autoFocus
+            />
 
-          <input
-            type="password"
-            placeholder="Password"
-            className="form-control passworddiv"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+            <input
+              type="password"
+              placeholder="Password"
+              className="form-control passworddiv"
+              value={password}
+              onChange={(e) => this.setState({ password: e.target.value })}
+            />
 
-          <button className="glow-on-hover button">Login</button>
+            <button className="glow-on-hover button">Login</button>
 
-          <p className="switch newhere">
-            New here?
-            <button
-              type="button"
-              className="link-btn regibtn"
-              onClick={goSignup}
-            >
-              Register
-            </button>
-          </p>
-        </form>
+            <p className="switch newhere">
+              New here?
+              <button
+                type="button"
+                className="link-btn regibtn"
+                onClick={goSignup}
+              >
+                Register
+              </button>
+            </p>
+          </form>
+        </div>
+
+        <Dialog
+          open={dialogOpen}
+          onClose={() => this.setState({ dialogOpen: false })}
+        >
+          <DialogTitle>Login Error</DialogTitle>
+          <DialogContent>{dialogMessage}</DialogContent>
+          <DialogActions>
+            <Button onClick={() => this.setState({ dialogOpen: false })}>
+              OK
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
-
-      <Dialog open={dialogOpen} onClose={() => this.setState({dialogOpen: false})}>
-        <DialogTitle>Login Error</DialogTitle>
-        <DialogContent>{dialogMessage}</DialogContent>
-        <DialogActions>
-          <Button onClick={() => this.setState({dialogOpen: false})}>OK</Button>
-        </DialogActions>
-      </Dialog>
-    </div>
-  );
-}
+    );
+  }
 }
 
 export default Login;
