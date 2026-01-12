@@ -34,14 +34,11 @@ function UsersTable({ onLogout }) {
     if (!editingUser) return;
 
     try {
-      const res = await fetch(
-        `http://localhost:5000/users/${editingUser.id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        }
-      );
+      const res = await fetch(`http://localhost:5000/users/${editingUser.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
 
       if (res.ok) {
         setEditingUser(null);
@@ -51,6 +48,15 @@ function UsersTable({ onLogout }) {
       console.error(err);
     }
   };
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const indexOfLastUser = currentPage * itemsPerPage;
+  const indexOfFirstUser = indexOfLastUser - itemsPerPage;
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+
+  const totalPages = Math.ceil(users.length / itemsPerPage);
 
   return (
     <div className="mainbg">
@@ -114,7 +120,7 @@ function UsersTable({ onLogout }) {
           </thead>
 
           <tbody>
-            {users.map((u) => (
+            {currentUsers.map((u) => (
               <tr key={u.id}>
                 <td>{u.id}</td>
                 <td>{u.email}</td>
@@ -130,14 +136,41 @@ function UsersTable({ onLogout }) {
             ))}
           </tbody>
         </table>
+
+        <div
+          className="pagination-controls"
+          style={{
+            marginTop: "10px",
+            display: "flex",
+            gap: "10px",
+            justifyContent: "center",
+          }}
+        >
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
 
-      {/* SIGN OUT DIALOG */}
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Confirm Sign Out</DialogTitle>
-        <DialogContent>
-          Are you sure you want to sign out?
-        </DialogContent>
+        <DialogContent>Are you sure you want to sign out?</DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>No</Button>
           <Button
