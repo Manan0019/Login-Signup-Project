@@ -103,6 +103,25 @@ app.put("/users/:id", (req, res) => {
   });
 });
 
+app.delete("/users/:id", (req, res) => {
+  const { id } = req.params;
+
+  const sql = "DELETE FROM users WHERE id = ?";
+
+  db.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Delete failed" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ message: "User deleted successfully" });
+  });
+});
+
 
 
 

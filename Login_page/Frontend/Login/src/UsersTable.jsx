@@ -13,6 +13,7 @@ function UsersTable({ onLogout }) {
   const [open, setOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [email, setEmail] = useState("");
+  const [deleteUser, setDeleteUser] = useState(null);
 
   const fetchUsers = () => {
     fetch("http://localhost:5000/users")
@@ -49,6 +50,17 @@ function UsersTable({ onLogout }) {
     }
   };
 
+  const handleDelete = async () => {
+    if (!deleteUser) return;
+
+    await fetch(`http://localhost:5000/users/${deleteUser.id}`, {
+      method: "DELETE",
+    });
+
+    setDeleteUser(null);
+    fetchUsers();
+  };
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -61,7 +73,6 @@ function UsersTable({ onLogout }) {
   return (
     <div className="mainbg">
       <div className="middle users">
-        {/* HEADER */}
         <div
           style={{
             display: "flex",
@@ -83,7 +94,6 @@ function UsersTable({ onLogout }) {
           </Button>
         </div>
 
-        {/* EDIT CARD */}
         {editingUser && (
           <div className="edit-card">
             <h3>Edit User</h3>
@@ -109,13 +119,13 @@ function UsersTable({ onLogout }) {
           </div>
         )}
 
-        {/* TABLE */}
         <table className="user-table">
           <thead>
             <tr>
               <th>ID</th>
               <th>Email</th>
               <th>Edit</th>
+              <th>Delete</th>
             </tr>
           </thead>
 
@@ -130,6 +140,11 @@ function UsersTable({ onLogout }) {
                     onClick={() => handleEditClick(u)}
                   >
                     ✏️
+                  </button>
+                </td>
+                <td>
+                  <button className="edit-btn" onClick={() => setDeleteUser(u)}>
+                    🗑️
                   </button>
                 </td>
               </tr>
@@ -167,6 +182,18 @@ function UsersTable({ onLogout }) {
           </button>
         </div>
       </div>
+      <Dialog open={!!deleteUser} onClose={() => setDeleteUser(null)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this user?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteUser(null)}>No</Button>
+          <Button color="error" onClick={handleDelete}>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Confirm Sign Out</DialogTitle>
