@@ -13,9 +13,35 @@ function Login({ onSuccess, goSignup }) {
   const [password, setPassword] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 🔴 EMAIL EMPTY CHECK
+    if (!email) {
+      setDialogMessage("Please enter your email");
+      setDialogOpen(true);
+      return;
+    }
+
+    // 🔴 EMAIL FORMAT CHECK
+    if (!isValidEmail(email)) {
+      setDialogMessage("Please enter a valid email address");
+      setDialogOpen(true);
+      return;
+    }
+
+    // 🔴 PASSWORD EMPTY CHECK
+    if (!password) {
+      setDialogMessage("Please enter your password");
+      setDialogOpen(true);
+      return;
+    }
+
     try {
       const res = await fetch("http://localhost:5000/login-verify", {
         method: "POST",
@@ -44,6 +70,7 @@ function Login({ onSuccess, goSignup }) {
 
         <form onSubmit={handleSubmit}>
           <input
+            type="email"
             placeholder="Email"
             className="form-control emaildiv"
             value={email}

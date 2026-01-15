@@ -15,25 +15,69 @@ function Signup({ goLogin }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await fetch("http://localhost:5000/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      setDialogMessage(data.message);
+    // 🔴 EMAIL EMPTY CHECK
+    if (!email) {
+      setDialogMessage("Please enter your email");
       setIsSuccess(false);
       setDialogOpen(true);
-    } else {
-      setDialogMessage("Thank you for registering! Please login to continue.");
-      setIsSuccess(true);
+      return;
+    }
+
+    // 🔴 EMAIL FORMAT CHECK
+    if (!isValidEmail(email)) {
+      setDialogMessage("Please enter a valid email address");
+      setIsSuccess(false);
+      setDialogOpen(true);
+      return;
+    }
+
+    // 🔴 PASSWORD EMPTY CHECK
+    if (!password) {
+      setDialogMessage("Please enter your password");
+      setIsSuccess(false);
+      setDialogOpen(true);
+      return;
+    }
+
+    // 🔴 PASSWORD LENGTH CHECK (recommended)
+    if (password.length < 6) {
+      setDialogMessage("Password must be at least 6 characters long");
+      setIsSuccess(false);
+      setDialogOpen(true);
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:5000/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setDialogMessage(data.message);
+        setIsSuccess(false);
+        setDialogOpen(true);
+      } else {
+        setDialogMessage(
+          "Thank you for registering! Please login to continue."
+        );
+        setIsSuccess(true);
+        setDialogOpen(true);
+      }
+    } catch (error) {
+      setDialogMessage("Registration failed. Please try again.");
+      setIsSuccess(false);
       setDialogOpen(true);
     }
   };
@@ -53,6 +97,7 @@ function Signup({ goLogin }) {
 
         <form onSubmit={handleSubmit}>
           <input
+            type="email"
             placeholder="Email"
             className="form-control emaildiv"
             value={email}
