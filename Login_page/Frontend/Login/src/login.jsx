@@ -8,15 +8,11 @@ import {
 } from "@mui/material";
 import "./login.css";
 
-function Login({ onSuccess, goSignup }) {
+function Login({ onSuccess, goSignup, goForget }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
-  const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,13 +20,6 @@ function Login({ onSuccess, goSignup }) {
     // 🔴 EMAIL EMPTY CHECK
     if (!email) {
       setDialogMessage("Please enter your email");
-      setDialogOpen(true);
-      return;
-    }
-
-    // 🔴 EMAIL FORMAT CHECK
-    if (!isValidEmail(email)) {
-      setDialogMessage("Please enter a valid email address");
       setDialogOpen(true);
       return;
     }
@@ -68,7 +57,7 @@ function Login({ onSuccess, goSignup }) {
       <div className="middle">
         <h2 className="welcome">Login</h2>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <input
             type="email"
             placeholder="Email"
@@ -86,15 +75,17 @@ function Login({ onSuccess, goSignup }) {
             onChange={(e) => setPassword(e.target.value)}
           />
 
+          <div className="forgot-wrapper">
+            <button type="button" className="forgot-link" onClick={goForget}>
+              Forgot password?
+            </button>
+          </div>
+
           <button className="glow-on-hover button">Login</button>
 
-          <p className="switch newhere">
+          <p className="newhere">
             New here?
-            <button
-              type="button"
-              className="link-btn regibtn"
-              onClick={goSignup}
-            >
+            <button type="button" className="regibtn" onClick={goSignup}>
               Register
             </button>
           </p>

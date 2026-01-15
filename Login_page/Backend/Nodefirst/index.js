@@ -4,6 +4,8 @@ const mysql = require("mysql2");
 
 const app = express();
 
+const otpStore = {};
+
 app.use(cors());
 app.use(express.json());
 
@@ -21,6 +23,65 @@ db.connect((err) => {
     console.log("MySQL connected successfully");
   }
 });
+
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "mananbhayani3@gmail.com",
+    pass: "hgcgklnjsonklhmf", 
+  },
+});
+
+
+app.post("/send-otp", (req, res) => {
+  const { email } = req.body;
+  const otp = Math.floor(100000 + Math.random() * 900000);
+
+  otpStore[email] = {
+    otp,
+    expires: Date.now() + 5 * 60 * 1000,
+  };
+
+  transporter.sendMail({
+    from: "mananbhayani3@gmail.com",
+    to: email,
+    subject: "Your OTP Code",
+    text: `Your OTP is ${otp}. It is valid for 5 minutes.`,
+  });
+
+  res.json({ message: "OTP sent" });
+});
+
+app.post("/verify-otp", (req, res) => {
+  const { email, otp } = req.body;
+  const record = otpStore[email];
+
+  if (!record)
+    return res.status(400).json({ message: "OTP not found" });
+
+  if (Date.now() > record.expires || record.otp != otp)
+    return res.status(400).json({ message: "Invalid or expired OTP" });
+
+  delete otpStore[email];
+  res.json({ message: "OTP verified" });
+});
+
+app.post("/reset-password", (req, res) => {
+  const { email, password } = req.body;
+
+  const sql = "UPDATE users SET password = ? WHERE email = ?";
+  db.query(sql, [password, email], (err) => {
+    if (err) {
+      return res.status(500).json({ message: "Update failed" });
+    }
+    res.json({ message: "Password updated" });
+  });
+});
+
 
 /* ================= REGISTER ================= */
 app.post("/register", (req, res) => {
@@ -121,6 +182,9 @@ app.delete("/users/:id", (req, res) => {
     res.json({ message: "User deleted successfully" });
   });
 });
+
+
+
 
 
 

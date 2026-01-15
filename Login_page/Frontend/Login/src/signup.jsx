@@ -10,36 +10,94 @@ import "./login.css";
 
 function Signup({ goLogin }) {
   const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
+
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+
+  // ✅ Email validation helper
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
+  // ✅ Send OTP
+  const handleSendOtp = async () => {
+    if (!email) {
+      setDialogMessage("Please enter your email");
+      setDialogOpen(true);
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setDialogMessage("Please enter a valid email address");
+      setDialogOpen(true);
+      return;
+    }
+
+    try {
+      await fetch("http://localhost:5000/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      setOtpSent(true);
+      setDialogMessage("OTP sent to your email");
+      setDialogOpen(true);
+    } catch (error) {
+      setDialogMessage("Failed to send OTP. Please try again.");
+      setDialogOpen(true);
+    }
+  };
+
+  // ✅ Verify OTP
+  const handleVerifyOtp = async () => {
+    if (!otp) {
+      setDialogMessage("Please enter the OTP");
+      setDialogOpen(true);
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:5000/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setDialogMessage(data.message);
+        setDialogOpen(true);
+      } else {
+        setOtpVerified(true);
+        setDialogMessage("Email verified successfully");
+        setDialogOpen(true);
+      }
+    } catch (error) {
+      setDialogMessage("OTP verification failed");
+      setDialogOpen(true);
+    }
+  };
+
+  // ✅ Final register
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 🔴 EMAIL EMPTY CHECK
-    if (!email) {
-      setDialogMessage("Please enter your email");
+    if (!otpVerified) {
+      setDialogMessage("Please verify your email first");
       setIsSuccess(false);
       setDialogOpen(true);
       return;
     }
 
-    // 🔴 EMAIL FORMAT CHECK
-    if (!isValidEmail(email)) {
-      setDialogMessage("Please enter a valid email address");
-      setIsSuccess(false);
-      setDialogOpen(true);
-      return;
-    }
-
-    // 🔴 PASSWORD EMPTY CHECK
     if (!password) {
       setDialogMessage("Please enter your password");
       setIsSuccess(false);
@@ -47,7 +105,6 @@ function Signup({ goLogin }) {
       return;
     }
 
-    // 🔴 PASSWORD LENGTH CHECK (recommended)
     if (password.length < 6) {
       setDialogMessage("Password must be at least 6 characters long");
       setIsSuccess(false);
@@ -84,7 +141,6 @@ function Signup({ goLogin }) {
 
   const handleDialogClose = () => {
     setDialogOpen(false);
-
     if (isSuccess) {
       goLogin();
     }
@@ -96,6 +152,7 @@ function Signup({ goLogin }) {
         <h2 className="welcome">Register</h2>
 
         <form onSubmit={handleSubmit}>
+          {/* EMAIL */}
           <input
             type="email"
             placeholder="Email"
@@ -103,17 +160,54 @@ function Signup({ goLogin }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             autoFocus
+            disabled={otpSent}
           />
 
-          <input
-            type="password"
-            placeholder="Password"
-            className="form-control passworddiv"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          {/* SEND OTP */}
+          {!otpSent && (
+            <button
+              type="button"
+              className="glow-on-hover button"
+              onClick={handleSendOtp}
+            >
+              Send OTP
+            </button>
+          )}
 
-          <button className="glow-on-hover button">Register</button>
+          {/* OTP INPUT */}
+          {otpSent && !otpVerified && (
+            <>
+              <input
+                placeholder="Enter OTP"
+                className="form-control passworddiv"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+              />
+
+              <button
+                type="button"
+                className="glow-on-hover button"
+                onClick={handleVerifyOtp}
+              >
+                Verify OTP
+              </button>
+            </>
+          )}
+
+          {/* PASSWORD */}
+          {otpVerified && (
+            <>
+              <input
+                type="password"
+                placeholder="Set Password"
+                className="form-control passworddiv"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+
+              <button className="glow-on-hover button">Register</button>
+            </>
+          )}
 
           <p className="switch newhere">
             Already have an account?
@@ -128,14 +222,12 @@ function Signup({ goLogin }) {
         </form>
       </div>
 
-      {/* 🔔 THANK YOU / ERROR DIALOG */}
+      {/* DIALOG */}
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
         <DialogTitle>
-          {isSuccess ? "Registration Successful" : "Registration Error"}
+          {isSuccess ? "Registration Successful" : "Message"}
         </DialogTitle>
-
         <DialogContent>{dialogMessage}</DialogContent>
-
         <DialogActions>
           <Button onClick={handleDialogClose}>OK</Button>
         </DialogActions>
