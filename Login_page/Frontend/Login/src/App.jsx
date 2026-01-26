@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Login from "./login";
 import Signup from "./signup";
 import UsersTable from "./UsersTable";
+import ForgetPassword from "./ForgetPassword";
 import "./login.css";
 
 function App() {
@@ -20,16 +21,15 @@ function App() {
         <Login
           onSuccess={() => setPage("users")}
           goSignup={() => setPage("signup")}
+          goForget={() => setPage("forget")}
         />
       )}
 
-      {page === "signup" && (
-        <Signup goLogin={() => setPage("login")} />
-      )}
+      {page === "signup" && <Signup goLogin={() => setPage("login")} />}
 
-      {page === "users" && (
-        <UsersTable onLogout={() => setPage("login")} />
-      )}
+      {page === "users" && <UsersTable onLogout={() => setPage("login")} />}
+
+      {page === "forget" && <ForgetPassword goLogin={() => setPage("login")} />}
     </div>
   );
 }
